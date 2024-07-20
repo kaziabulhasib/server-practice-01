@@ -8,12 +8,13 @@ app.use(cors());
 app.use(express.json());
 
 // db connection
-// demoUser
-// msoi8SXO69FGHaYY
+//DB_USER=demoUser
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const uri =
-  "mongodb+srv://demoUser:msoi8SXO69FGHaYY@cluster0.ggulbwq.mongodb.net/?appName=Cluster0";
+//
+
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ggulbwq.mongodb.net/?appName=Cluster0`;
+const uri = `mongodb+srv://demoUser:msoi8SXO69FGHaYY@cluster0.ggulbwq.mongodb.net/?appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -27,25 +28,33 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const userCollection = client.db("jtDb").collection("users");
-
+    // get all users
     app.get("/users", async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
 
+    // get a particular user
+
+    app.get("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await userCollection.findOne(query);
+      res.send(result);
+    });
+
     app.post("/users", async (req, res) => {
       const user = req.body;
-      console.log("new user", user);
+      // console.log("new user", user);
       const result = await userCollection.insertOne(user);
       res.send(result);
     });
 
-    app.delete("/users", async (req, res) => {
-      const user = req.body;
-      const result = await userCollection.deleteOne(user);
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await userCollection.deleteOne({ _id: new ObjectId(id) });
       res.send(result);
     });
-
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
     // Send a ping to confirm a successful connection
