@@ -34,7 +34,7 @@ async function run() {
       res.send(result);
     });
 
-    // get a particular user
+    // get a particular user route
 
     app.get("/users/:id", async (req, res) => {
       const id = req.params.id;
@@ -53,6 +53,28 @@ async function run() {
     app.delete("/users/:id", async (req, res) => {
       const id = req.params.id;
       const result = await userCollection.deleteOne({ _id: new ObjectId(id) });
+      res.send(result);
+    });
+
+    // update route
+
+    app.get("/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = userCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.put("/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const data = {
+        $set: {
+          name: req.body.name,
+          email: req.body.email,
+        },
+      };
+      const result = await userCollection.updateOne(query, data);
       res.send(result);
     });
     // Connect the client to the server	(optional starting in v4.7)
